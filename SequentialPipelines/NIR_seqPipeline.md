@@ -49,7 +49,7 @@ Script d'interface. Modification des fichier de configuration
 
 ### Step 3 : SimPlannerPointingProgramm
 
-    python3 1_SimPlannerPointingProgramm.py >& SimPlannerPointingProgramm.log
+    python3 3_SimPlannerProgram.py >& SimPlannerPointingProgramm.log
 
 Quels fichiers sont crees ?
 

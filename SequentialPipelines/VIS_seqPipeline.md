@@ -142,7 +142,7 @@ Script d'interface. Modification des fichier de configuration
 
 ### Etape 3 : SimPlannerPointingProgramm
 
-    python3 1_SimPlannerPointingProgramm.py >& SimPlannerPointingProgramm.log
+    python3 3_SimPlannerProgram.py >& SimPlannerPointingProgramm.log
 
 Quels fichiers sont crees ?
 
@@ -154,7 +154,7 @@ Creates call_pointing.iterations.1.SimSplitter_pkg/VIS_input_pointing_list.json
 
 Separation des jobs par detecteur, preparation des fichiers de configuration.
 
-    python3 3_EuclidVisSplit.py >& EuclidVisSplit.log
+    python3 4_EuclidVisSplit.py >& EuclidVisSplit.log
 
 Quels fichiers / repertoires ont ete crees ? 
 
@@ -168,8 +168,8 @@ Execute la simulation.
 
 WARNING : runtime ~ 15mn ! Etudier les logs (EuclidVisDetector.log)
 
-    python3 4_EuclidVisDetector.py >& EuclidVisDetector.log
+    python3 5_EuclidVisDetector.py >& EuclidVisDetector.log
 
-Ou sont les sorties ? de quels types sont ells ?
+Ou sont les sorties ? de quels types sont elles ?
 Ouvrir les images avec ds9 (apres copie des fichiers FITS sur votre machine locale).
 
