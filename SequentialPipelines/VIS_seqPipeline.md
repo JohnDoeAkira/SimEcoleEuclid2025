@@ -62,9 +62,9 @@ Simulation request pour le second pipeline (postTU Instrument pipeline)
     pkgRepository=/cvmfs/euclid.in2p3.fr/EDEN-3.1/opt/euclid/SIM_IAL_Pipelines/3.3.5/InstallArea/x86_64-conda_ry9-gcc11-o2g/auxdir/SIM_Pipelines/
     pipelineDir=/cvmfs/euclid.in2p3.fr/EDEN-3.1/opt/euclid/SIM_IAL_Pipelines/3.3.5/InstallArea/x86_64-conda_ry9-gcc11-o2g/auxdir/SIM_Pipelines/
 
-* **tucatalog** : True universe star/galaxy catalog (output of TU catalog) 
-* **inputconfs** : json list of input configurations (output of TU pipeline)
-* **Instrument models** : files of various formats in the data directory 
+* **tucatalog** : Catalogues d'etoiles et de galaxies 
+* **inputconfs** : liste json de fichier de configuration d'entree (VIS task)
+* **Instrument models** : divers formats de fichiers de modeles d'instrument
 
 ### Processing elements (briques du pipeline)
 
