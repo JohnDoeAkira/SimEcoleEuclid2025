@@ -76,8 +76,9 @@ En production VIS, les pipelines (TU et postTU) sont executes par le pipelineRun
 Ici nous allons tout executer manuellement.
 La seule difference est l'automation par l'IAL.
 * SimPlanner : Separe la requete par observation 
-* SimPlannerPointingProgramm : Separe par instrument
-* EuclidTU : Merge les catalogues 
+* EuclidTU : Merge les catalogues
+* SimTuInputConfMatch : Interface pipeline1 - pipeline2
+* SimPlannerPointingProgramm : Separe par instrument 
 * EuclidVisSplit : Separe les simulations par detecteur (et construit les fichiers de configuration pour les simulateurs d'instrument)
 * EuclidVisDetector : Execute la simulation
 * EuclidVisCombine : Combine les detecteurs (36 CCD pour VIS) 
@@ -87,9 +88,10 @@ Les scripts correspondant sont les suivants pour le pipeline TU (/sps/training/r
 * 1_EuclidTU.py
 
 Les scripts correspondant sont les suivants pour le pipeline postTU (/sps/training/reference/VIS/workdir): 
-* 2_SimPlannerPointing
-* 3_EuclidVisSplit.py
-* 4_EuclidVisDetector.py
+* 2_SimTuInputConfMatch.py
+* 3_SimPlannerPointing
+* 4_EuclidVisSplit.py
+* 5_EuclidVisDetector.py
 
 Essayez de retrouver a quels scripts correspondent les fonctions des pipeline Script ci-dessus (PipScript_TU.py et PipScript_VIS_PostTU.py).
 
@@ -104,7 +106,7 @@ Lire les scripts avant (ou pendant) l'execution pour comprendre leurs interfaces
 
 ## TU pipeline
 
-### Etape 1 : SimPlanner
+### Etape 0 : SimPlanner
 
     python3 0_SimPlanner.py >& SimPlanner.log
  
@@ -115,7 +117,7 @@ Creates SimPlanner_pkg/pointing_input_files_list.json : the list of simulated po
   * contain the list of TASKS 
     * these tasks as xml files are stored in the data directory
     
-## Etape 2 : True Universe
+## Etape 1 : True Universe
 
 Fusionner les catalogues d'entree :
 
@@ -131,6 +133,12 @@ Creates the output TU object :
       * EUC_SIM_TUGALCAT-18539_0A0369F9BC4B-0024553_20220613T225155.306234Z_v3_SC8_Pilot.fits
 
 ## postTU pipeline
+
+### Etape 2 : SimTuInputConfMatch
+
+    python3 2_SimTuInputConfMatch.py > SimTuInputConfMatch.log
+
+Script d'interface. Modification des fichier de configuration
 
 ### Etape 3 : SimPlannerPointingProgramm
 

@@ -40,6 +40,11 @@ Cette etape est identique au pipeline VIS.
 
 ## postTU pipeline
 
+### Etape 2 : SimTuInputConfMatch
+
+    python3 2_SimTuInputConfMatch.py > SimTuInputConfMatch.log
+
+Script d'interface. Modification des fichier de configuration
 
 
 ### Step 3 : SimPlannerPointingProgramm
