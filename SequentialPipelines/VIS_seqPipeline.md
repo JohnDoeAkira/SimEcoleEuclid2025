@@ -136,28 +136,27 @@ Creates the output TU object :
 
     python3 1_SimPlannerPointingProgramm.py >& SimPlannerPointingProgramm.log
 
-What files are created ?
+Quels fichiers sont crees ?
 
 Creates call_pointing.iterations.1.SimSplitter_pkg/VIS_input_pointing_list.json
 * contains the list of VIS_Tasks
 
 
-
 ## Step 4 : Euclid Vis Splitter
 
-Split in jobs by detectors 
+Separation des jobs par detecteur, preparation des fichiers de configuration.
 
     python3 3_EuclidVisSplit.py >& EuclidVisSplit.log
 
-What files / directories are created ?
+Quels fichiers / repertoires ont ete crees ? 
 
 Creates the ELViS config files for all detectors (myVISconf***)
 * split the model files from FPA to CCD individal files (HOTPIX, BIAS, etc ...)
 * split catalog files in CCDs
 
-## Step 5 : Run the actual image simulation by detector 
+## Step 5 : execute le simulateur d'image par detecteur 
 
-Run the simulation. 
+Execute la simulation. 
 
 WARNING : runtime ~ 15mn ! Check the logs (tail EuclidVisDetector.log)
 
