@@ -158,11 +158,10 @@ Creates the ELViS config files for all detectors (myVISconf***)
 
 Execute la simulation. 
 
-WARNING : runtime ~ 15mn ! Check the logs (tail EuclidVisDetector.log)
+WARNING : runtime ~ 15mn ! Etudier les logs (EuclidVisDetector.log)
 
     python3 4_EuclidVisDetector.py >& EuclidVisDetector.log
 
-Run the actual images simulation.
+Ou sont les sorties ? de quels types sont ells ?
+Ouvrir les images avec ds9 (apres copie des fichiers FITS sur votre machine locale).
 
-Where are the outputs ? What king of outputs do you get.
-Open the FITS images with ds9 (copy the outputVIS.gz file locally before opening with ds9)
