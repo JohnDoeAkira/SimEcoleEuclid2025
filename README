@@ -1,5 +1,5 @@
-#SimEcoleEte2025
-Sim Hands on session - Les Houches Euclid Advanced School 2022
+# SimEcoleEte2025
+Sim Hands on session - Ecole d'ete Euclid 2025
 
 ## Prerequisites
 
@@ -7,8 +7,7 @@ Sim Hands on session - Les Houches Euclid Advanced School 2022
 
 ## Run the pipeline sequentially
 
-Unlike in real production where the bricks of the pipeline are run in parallel over many cores, we will tun
-the pipeline sequentially to produce a single detector for each channel.
+Contrairement aux productions officielles pour lesquelles les briques du pipeline sont executees automatiquement en parallele sur plusieurs coeurs, nous allons les executer manuellement les unes apres les autres pour produire un unique detecteur par canal.
 
 # VIS pipeline
 
