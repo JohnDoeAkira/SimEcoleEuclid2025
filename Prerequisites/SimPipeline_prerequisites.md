@@ -52,29 +52,36 @@ Pour lancer l'environnement software EDEN, executer :
     source /cvmfs/euclid-dev.in2p3.fr/EDEN-3.1/bin/activate
 
 
-## The SIM pipeline (obsolete)
+## Le pipeline SIM 
+
+Pour la production automatique, les versions successives des codes du segment sol Euclid sont compile, teste et deployes de maniere automatique sur les centre de calcul (sous forme de systeme de fichier montes a distance cvmfs). Nous utiliserons ces versions directement accessibles sans necessite d'installation specifique.
+
+Si vous souhaitez modifier les briques du pipeline pour les executer avec vos modifications, c'est toujours possible en suivant les sections suivantes.
+
+Nous allons tout de meme recuperer le code du pipeline pour en identifier les composantes.
 
 ### Get the SIM pipeline repository
 
-For those who have access to the official Euclid Gitlab, clone it locally (and checkout tag 1.0.14):
+Pour ceux qui ont acces au GitLab Euclid, clonez le repo localement :
 
     mkdir /sps/training/<UserName>/Projects
 	cd /sps/training/<UserName>/Projects
 	git clone https://gitlab.euclid-sgs.uk/PF-SIM/sim_ial_pipelines.git sim_ial_pipeline
-	git checkout 1.0.14
+	git checkout 3.3.5
 
-For the other, please copy it from the /sps/training/SIMressources :
+Pour les autres, copiez le depuis : /sps/training/reference/Projects/
 
     mkdir /sps/training/<UserName>/Projects
 	cd /sps/training/<UserName>/Projects
-    cp -r /sps/training/SIMressources/sim_ial_pipeline .
+    cp -r /sps/training/reference/Projects/sim_ial_pipeline/ .
 
-Look at the two main files of the pipeline :
-* *SIM_IAL_Pipelines/auxdir/SIM_Pipelines/PkgDef_SIM.py* : description of the pipeline elements
-* *SIM_IAL_Pipelines/auxdir/SIM_Pipelines/SIM_SplittedPipeline/PipScript_SIM_Splitted.py* : Sequential chaining of the pipeline
+Regardez les trois fichiers suivants : 
+* *SIM_IAL_Pipelines/auxdir/SIM_Pipelines/PkgDef_SIM.py* : description des Processing Elements (briques) du pipeline
+* *SIM_IAL_Pipelines/auxdir/SIM_Pipelines/SIM_TUPipeline/PipScript_SIM_TU.py* : Chainage sequentiel (et parallele) des briques du pipeline TU
+* *SIM_IAL_Pipelines/auxdir/SIM_Pipelines/SIM_VIS_PostTUPipeline/PipScript_SIM_VIS_PostTU.py* : Chainage sequentiel (et parallele) des briques du pipeline TU
 
-Identify the various parts in the PkgDef : SimPlanner, EuclidTU, Sim<VIS-NIP-NIS-EXT>Splitter, SIM<VIS-NIP-NIS-EXT>Detector
-Study the chaining in the PipScript.
+Identifier les divers elements du PkgDef : SimPlanner, EuclidTU, Sim<VIS-NIP-NIS-EXT>Splitter, SIM<VIS-NIP-NIS-EXT>Detector
+Regardez le chainage dans les PipScripts
 
 ## Recuperer les donnees pour la simulation
 
