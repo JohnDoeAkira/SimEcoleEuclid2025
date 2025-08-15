@@ -1,49 +1,58 @@
 # Prerequisites
 
-## Working at CC-IN2P3
+## Le CC-IN2P3
 
 ### Login
 
-We will be using the french SDC (science data center) for the hand's on session. This is a computer grid in Lyon 
-operated by the in2p3 (particle physics department of CNRS). You have received temporary username/password to connect 
-to the CC. To connect by ssh :
+Nous utiliserons le SDC francais (Science data center CC-IN2P3) pour la session Hands on. C'est un centre de calcul 
+de Lyon opere par l'In2p3 (CNRS pour la physique des particules). Vous avez recu des login/password temporaires pour vous 
+connecter au CC. Voici comment s'y connecter par ssh :
 
     ssh -Y <user>@cca.in2p3.fr
 
+### Ressources 
+
+Le CC a reserve deux serveurs (de 64 coeurs / 192Go de RAM). Cela suffira pour une douzaine de coeurs 
+par utilisateur. Concernant l'espace disque, nous travaillerons sur /sps/training. L'espace disque ne devrait 
+pas poser de probleme.
+
 ### Interactive jobs
 
-When doing so, you are logged on a login node that is not suitable for heavy computing. To perform CPU, I/O intensive 
-tasks you will need to log on computing nodes. We will use interactive jobs instead of batch jobs for this session. 
-Hereafter is an example of a interactive job request on 3 cores for a walltime of 3 hours (in bash). 
+Lorsque vous vous connectez, vous arrivez sur une noeud de login qui ne doit pas etre utilise pour des calculs intensifs. Pour effectuer des calculs, il faut soit utiliser le systeme de distribution de jobs (slurm batch schuduling) ou un job interactif.
+
+Les jobs interactifs permettent de se connecter avec une interface en ligne de commande sur des noeuds de calcul. Attention, les jobs interactifs sont distribues sur la queue generale et non pas sur les serveurs reserves.
+
+Voici un exemple d'une requete pour un job interactif de 3 coeurs pour un walltime de 3 heures (en bash).
 
     srun --account=training --reservation=training_67 -n 3 --time=3:00:00 --pty bash -i
 
-### Ressources 
+### Software additionnels
 
-CC has booked two servers for us during two weeks. This should be enough for 3 to 4 cores each. 
-Regarding disk volumes, we will work on /sps/training. The disk space should not be an issue.
+Installer topcat sur votre machine personnelle : 
+
+    https://www.star.bris.ac.uk/~mbt/topcat/
 
 ### Documentation
 
-To get more familiar with the CC, you can have a look at these tutorials :
+Pour etre plus familier de l'usage du CC dans Euclid :
 
-    https://gitlab.in2p3.fr/ccin2p3-support/formations/batch/2022.02/tuto_batch/-/tree/master
+    https://cceuclid-doc.in2p3.fr/
 
 
-## Codes directory
+## Les repertoires de travail
 
-First create a directory of your own for the cloned codes.
-The working directory of the temporary account is */sps/training*. Then you need to create you own :
+Les repertoires de travail sont deja crees avec le chemin suivant : 
 
-    mkdir /sps/training/<UserName>  , user whatever account username, your real name, nickname ...
 
-Load the EDEN3.0 environment (Euclid env)
+    /sps/training/<UserName>
+
+Pour lancer l'environnement software EDEN, executer : 
 
     export User_area=/sps/training/<UserName>/Projects/
-    source /cvmfs/euclid-dev.in2p3.fr/CentOS7/EDEN-3.0/bin/activate
+    source /cvmfs/euclid-dev.in2p3.fr/EDEN-3.1/bin/activate
 
 
-## The SIM pipeline
+## The SIM pipeline (obsolete)
 
 ### Get the SIM pipeline repository
 
@@ -67,173 +76,29 @@ Look at the two main files of the pipeline :
 Identify the various parts in the PkgDef : SimPlanner, EuclidTU, Sim<VIS-NIP-NIS-EXT>Splitter, SIM<VIS-NIP-NIS-EXT>Detector
 Study the chaining in the PipScript.
 
-## Get the input data for the simulations
+## Recuperer les donnees pour la simulation
 
-### Clone a PPO (Pipeline Processing Order) ... if you have a Euclid account
+Pour cela, copier l'integralite du repertoire /sps/training/reference/COSMOS_VIS dans votre repertoire de travail. 
 
-The easiest way to get all the necessary inputs for a simulation is to start with a PPO that has already been executed
-(in any Euclid production, official SIM, custom of some EC member). They are all stored on the Euclid archive (EAS).
+Attention, si vous le pouvez ne copiez pas le contenu du repertoire data dans votre repertoire. Creez plutot un repertoire workdir/data (dans votre repertoire workdir/) et liez les elements de data dans celui ci. Cela permet d'eviter de dupliquer inutilement les elements communs a tous les utilisateurs.
 
-    # Download the PPO
-    mkdir /sps/training/<UserName>/PPO; cd /sps/training/<UserName>/PPO
-    python /sps/training/SIMressources/scripts/dataProductRetrieval_PV.py
-        --username phudelot
-        --password 'XXXXXX'
-        --project TEST
-        --data_product PipelineProcessingOrder                  # Data Model object type PPO
-        --query="DataSetRelease=SIMVIS_CYCLE13_R4"              # SQL query for a specific PPO
+    mkdir /sps/training/<UserName>/COSMOS_VIS/workdir/data
+    cd /sps/training/<UserName>/COSMOS_VIS/workdir/data
+    ln -s /sps/training/reference/COSMOS_VIS/workdir/data/* .
 
-Then you can "clone" the PPO workdir in your local directory (with links to all input products) using the PPO_workflow project.
-
-    # Get the SDC-FR-TOOLS project
-    cd /sps/training/<UserName>/Projects/
-    git clone https://gitlab.euclid-sgs.uk/SDC-FR/sdc-fr-tools.git sdc-fr-tools/
-    cd sdc-fr-tools/
-    make purge; make; make install
-
-    # Clone the PPO
-    # input = /sps/training/PV_inputs is a cache directory with local input files. When PPO files are not present,
-    # they are downloaded. Otherwise they are linked.
-    mkdir /sps/training/<UserName>/clonedPPO; cd /sps/training/<UserName>/clonedPPO
-    ERun PPO_workflow 1.8 CloneToLocal
-    --ppo /sps/training/hudelot/ClonePPO/test_VIS_C13/PipelineProcessingOrder__0.xml
-    --output /sps/training/hudelot/ClonePPO/ClonePPO_VIS_C13
-    --easUser phudelot
-    --easPwd 'XXXX'
-    --sdc SDC-FR
-    --input /sps/training/PV_inputs
-
-### Copy the PPO workdir if you don't have a Euclid account
-
-If you do not have an official Euclid account you can copy this directory (warning ... it's big !).
-If you can, please copy everything but the workdir/data directory into your workdir, then create an empty data directory, and lik all individual elements of  /sps/training/hudelot/ClonePPO/ClonePPO_VIS_C13/workdir/data in your data directory. This would avoid the copy and only link the content of the data directory.
-	
-	/sps/training/hudelot/ClonePPO/ClonePPO_VIS_C13
 	
 The final directory tree is :
 
-    .
-    ├── PipelineProcessingOrder__0.xml
-    ├── PR_script.sh
-    ├── sdc-fr-local.properties
-    └── workdir
-        ├── data
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2171_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2171_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2172_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2172_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2174_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2174_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2175_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2175_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2247_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2247_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2253_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2253_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2256_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2256_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2257_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2257_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2258_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2258_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2259_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2259_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2260_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2260_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2261_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2261_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2262_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2262_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2263_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2263_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2264_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2264_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2265_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2265_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2266_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2266_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2267_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2267_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2268_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2268_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2269_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2269_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2270_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2270_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2271_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2271_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2289_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2289_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2292_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2292_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2432_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2432_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2434_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2434_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2435_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2435_v3.xml
-        ├── EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2440_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_HIGHZ-1.10.13-2021-02-18_HPIX_5_NEST_2440_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2171_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2171_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2172_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2172_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2174_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2174_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2175_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2175_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2247_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2247_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2253_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2253_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2256_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2256_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2257_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2257_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2258_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2258_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2259_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2259_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2260_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2260_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2261_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2261_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2262_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2262_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2263_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2263_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2264_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2264_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2265_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2265_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2266_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2266_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2267_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2267_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2268_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2268_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2269_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2269_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2270_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2270_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2271_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2271_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2289_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2289_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2292_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2292_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2432_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2432_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2434_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2434_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2435_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2435_v3.xml
-        ├── EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2440_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_QSO-1.10.12-2021-02-18_HPIX_5_NEST_2440_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2171_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2171_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2172_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2172_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2174_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2174_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2175_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2175_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2247_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2247_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2253_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2253_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2256_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2256_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2257_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2257_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2258_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2258_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2259_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2259_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2260_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2260_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2261_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2261_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2262_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2262_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2263_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2263_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2264_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2264_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2265_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2265_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2266_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2266_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2267_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2267_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2268_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2268_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2269_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2269_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2270_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2270_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2271_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2271_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2289_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2289_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2292_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2292_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2432_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2432_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2434_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2434_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2435_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2435_v3.xml
-        ├── EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2440_v3.xml -> /sps/training/PV_inputs/EUC-GALCAT_STANDARD-1.10.11-2021-02-17_HPIX_5_NEST_2440_v3.xml
-        ├── EUC_MDB_MISSIONCONFIGURATION-DEV_2022-04-12T12:00:00.00Z_00.xml -> /sps/training/PV_inputs/EUC_MDB_MISSIONCONFIGURATION-DEV_2022-04-12T12:00:00.00Z_00.xml
-        ├── galcat.json
-        ├── params.dat
-        ├── SIM_REQ_C13_PILOT_3.xml -> /sps/training/PV_inputs/SIM_REQ_C13_PILOT_3.xml
-        ├── starcat.json
-        ├── STARCAT-RA227.49-DEC31.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA227.49-DEC31.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA227.53-DEC29.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA227.53-DEC29.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA229.81-DEC29.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA229.81-DEC29.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA229.83-DEC31.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA229.83-DEC31.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA230.08-DEC27.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA230.08-DEC27.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA230.13-DEC33.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA230.13-DEC33.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA230.73-DEC35.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA230.73-DEC35.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA232.10-DEC29.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA232.10-DEC29.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA232.16-DEC31.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA232.16-DEC31.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA232.32-DEC27.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA232.32-DEC27.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA232.51-DEC33.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA232.51-DEC33.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA233.17-DEC35.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA233.17-DEC35.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA234.39-DEC29.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA234.39-DEC29.00-v13_SC8_MAIN.xml
-        ├── STARCAT-RA234.49-DEC31.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA234.49-DEC31.00-v13_SC8_MAIN.xml
-        └── STARCAT-RA234.90-DEC33.00-v13_SC8_MAIN.xml -> /sps/training/PV_inputs/STARCAT-RA234.90-DEC33.00-v13_SC8_MAIN.xml
 
-The data directory is not expanded. It's too large. It contains all the input data referenced in the Mission Data Base.
+Le repertoire data n'est pas liste (trop gros). Il contient (entre autres fichiers) les elements references dans la base de donnees, les catalogues FITS et les fichiers references dans les calproducts.
 
-Try to identify the input elements of the simulations :
-* input catalogs (stars and galaxies)
-* input Mission Data Base object
-* Simulation Request (SimRequest)
+Essayez d'identifier les elements de la simulations : 
+* les catalogues d'entree (etoiles et galaxies)
+* la base de donnee mission (MBD)
+* la sim request
+* les fichiers de survey
+* les calproducts
 
-
-
-# The SimRequest generator 
-	
-[SimRequest and PPO generator](https://cceuclid-tools.in2p3.fr/sim_request/)
+Si vous avez installe topcat (https://www.star.bris.ac.uk/~mbt/topcat/), copiez un catalogue d'etoiles sur votre machine locale et afficher la distribution spatiale des objets (ra-dec) et la distribution en magnitude dans la bande VIS (-2.5log10(TU_FNU_VIS/3631)).
 
 
