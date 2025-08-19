@@ -28,9 +28,15 @@ Voici un exemple d'une requete pour un job interactif de 3 coeurs pour un wallti
 
     srun --account=training --reservation=training_67 -n 3 --time=3:00:00 --pty bash -i
 
+    source /cvmfs/euclid-dev.in2p3.fr/EDEN-3.1/bin/activate
+
+### Jobs en batch
+
 Pour lancer des jobs batch sur les noeuds reserves Euclid, le format des commande est le suivant (walltime 3h, nombre de cores 1, RAM 4G):
 
     sbatch -t 0-03:00 -n 1 --mem 4G --reservation euclid <script_bash>
+
+    
 
 ### Software additionnels
 

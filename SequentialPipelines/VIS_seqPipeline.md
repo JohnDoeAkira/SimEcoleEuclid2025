@@ -104,6 +104,19 @@ Copier les helper scripts des PE (Processing Elements) dans votre repertoire wor
 
 Lire les scripts avant (ou pendant) l'execution pour comprendre leurs interfaces (input/ output).
 
+### Mode interactif
+
+Si vous lancer les executables en mode interactif (ligne de commande), il est imperatif de vous placer dans un job interactif sur un noeud de calcul et de ne pas rester sur le noeud de login :
+
+    srun --account=training --reservation=training_67 -n 3 --time=3:00:00 --pty bash -i
+    
+
+### job batch
+
+Si vous voule
+
+
+
 ## TU pipeline
 
 ### Etape 0 : SimPlanner
@@ -117,6 +130,9 @@ Creates SimPlanner_pkg/pointing_input_files_list.json : the list of simulated po
   * contain the list of TASKS 
     * these tasks as xml files are stored in the data directory
     
+
+
+
 ## Etape 1 : True Universe
 
 Fusionner les catalogues d'entree :
@@ -172,4 +188,45 @@ WARNING : runtime ~ 15mn ! Etudier les logs (EuclidVisDetector.log)
 
 Ou sont les sorties ? de quels types sont elles ?
 Ouvrir les images avec ds9 (apres copie des fichiers FITS sur votre machine locale).
+
+## Step 5 bis : tuner le fichier de configuration de ELViS pour sauvegarder les images intermediaires
+
+Ajouter ces parametres au fichier de configuration de ELViS :
+
+    "FITS_STARS": 1         ,
+    "FITS_GHOSTS": 1         ,
+    "FITS_GALAXIES": 1         ,
+    "FITS_FAINTGALAXIES": 1         ,
+    "FITS_CALIBLAMP": 1         ,
+    "FITS_SHUTTER": 1         ,
+    "FITS_IPQE": 1         ,
+    "FITS_THERMAL": 1         ,
+    "FITS_BACKGROUND": 1         ,
+    "FITS_FLATFIELD": 1         ,
+    "FITS_CHARGEINJECTION": 1         ,
+    "FITS_CTI_CHARGEINJECTION": 1         ,
+    "FITS_TRAP_PUMPING": 1         ,
+    "FITS_COSMICRAYS": 1         ,
+    "FITS_DARK": 1         ,
+    "FITS_BLEEDING": 1         ,
+    "FITS_NOISE": 1         ,
+    "FITS_COSMETICS": 1         ,
+    "FITS_PREOVERSCAN": 1         ,
+    "FITS_PARALLELOVERSCAN": 1         ,
+    "FITS_RADIATIONDAMAGE": 1         ,
+    "FITS_NONLINEARITY": 1         ,
+    "FITS_READOUTNOISE": 1         ,
+    "FITS_ELECTRON2ADU": 1         ,
+    "FITS_BIAS": 1         ,
+    "FITS_XTALK": 1         ,
+    "FITS_DISCRETIZE": 1         ,
+    "FITS_BFE": 1
+
+Le fichier de config est le dernier fichier de la forme myVISconf_CCD35*.txt du repertoire data.
+
+Ensuite executer a nouveau l'etape 5 
+
+
+    python3 5_EuclidVisDetector.py >& EuclidVisDetector.log
+
 
