@@ -20,11 +20,17 @@ pas poser de probleme.
 
 Lorsque vous vous connectez, vous arrivez sur une noeud de login qui ne doit pas etre utilise pour des calculs intensifs. Pour effectuer des calculs, il faut soit utiliser le systeme de distribution de jobs (slurm batch schuduling) ou un job interactif.
 
-Les jobs interactifs permettent de se connecter avec une interface en ligne de commande sur des noeuds de calcul. Attention, les jobs interactifs sont distribues sur la queue generale et non pas sur les serveurs reserves.
+Les jobs interactifs permettent de se connecter avec une interface en ligne de commande sur des noeuds de calcul. 
+
+<span style="color:red">**Attention, les jobs interactifs sont distribues sur la queue generale et non pas sur les serveurs reserves.**</span>
 
 Voici un exemple d'une requete pour un job interactif de 3 coeurs pour un walltime de 3 heures (en bash).
 
     srun --account=training --reservation=training_67 -n 3 --time=3:00:00 --pty bash -i
+
+Pour lancer des jobs batch sur les noeuds reserves Euclid, le format des commande est le suivant (walltime 3h, nombre de cores 1, RAM 4G):
+
+    sbatch -t 0-03:00 -n 1 --mem 4G --reservation euclid <script_bash>
 
 ### Software additionnels
 
@@ -60,7 +66,7 @@ Si vous souhaitez modifier les briques du pipeline pour les executer avec vos mo
 
 Nous allons tout de meme recuperer le code du pipeline pour en identifier les composantes.
 
-### Get the SIM pipeline repository
+### Get the SIM pipeline repository (DEPRECATED - inutile)
 
 Pour ceux qui ont acces au GitLab Euclid, clonez le repo localement :
 
@@ -83,7 +89,7 @@ Regardez les trois fichiers suivants :
 Identifier les divers elements du PkgDef : SimPlanner, EuclidTU, Sim<VIS-NIP-NIS-EXT>Splitter, SIM<VIS-NIP-NIS-EXT>Detector
 Regardez le chainage dans les PipScripts
 
-## Recuperer les donnees pour la simulation
+## Recuperer les donnees pour la simulation (deja fait !!!!)
 
 Pour cela, copier l'integralite du repertoire /sps/training/reference/COSMOS_VIS dans votre repertoire de travail. 
 
